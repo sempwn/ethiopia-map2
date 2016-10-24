@@ -1,2 +1,2 @@
-# ethiopia-map2
-v2.0 of TRANSFIL lymphatic filariasis model for Ethiopia
+# ethiopia-map
+Demo of mapping projections for Lymphatic Filariasis in Ethiopia
