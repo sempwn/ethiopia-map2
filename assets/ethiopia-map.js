@@ -298,8 +298,8 @@ function createScenarioBoxes(){
 
 
   } else {
-    $('#mda-table-box, #scenario-panel').hide();
-    $('#first-time-panel').show();
+    $('#mda-table-box').hide();
+    $('#scenario-panel').show();
   }
   var list = d3.select('#scenario-tabs').append('ul').attr('class','nav nav-tabs');
   for(var i=0;i<n;i++){
@@ -1006,7 +1006,10 @@ $(document).ready(function(){
   $('#map-progress-bar').hide();
   $( "#sel-stat" ).change(drawMap);
   $('#select-woreda-text').hide();
-  $('#add-new-scenario').hide();
+  var n = SessionData.retrieveSession().scenarios.length;
+  if (n>0){
+    $('#add-new-scenario').hide();
+  }
 
 
 
