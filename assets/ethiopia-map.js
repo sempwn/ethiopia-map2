@@ -283,6 +283,8 @@ function createScenarioBoxes(){
     .on('click',function(){
       bootbox.confirm("Are you sure you want to delete this scenario?", function(result) {
         if(result){
+          var n = SessionData.retrieveSession().scenarios.length;
+
           SessionData.deleteScenario();
           createScenarioBoxes();
           scenarioComparisonSelectVisibility();
@@ -292,6 +294,9 @@ function createScenarioBoxes(){
           $('#scenario-button-group').show();
           $('#add-new-scenario').hide();
           $('#slider-div').show();
+          if(n==1){
+            newScenarioTab();
+          }
         }
       });
     });
@@ -409,12 +414,18 @@ function createScenarioBoxesOld(){
         $('#delete_scenario').removeClass('hidden').unbind().click(function(){
           bootbox.confirm("Are you sure you want to delete this scenario?", function(result) {
             if(result){
+              var n = SessionData.retrieveSession().scenarios.length
+              
               SessionData.deleteScenario();
               createScenarioBoxes();
               scenarioComparisonSelectVisibility();
               drawComparisonPlot();
               drawMap();
               $('#settings-modal').modal('hide');
+
+              if(n == 1){
+                newScenarioTab();
+              }
 
             }
           });
