@@ -635,10 +635,14 @@ function numberWithCommas(x) {
 }
 
 function runMapSimulation(){
-  var IU_index = $('.active-IU')[0].id;
+  if($('.active-IU')[0]){
+    var IU_index = $('.active-IU')[0].id;
+  } else {
+    var IU_index = undefined;
+  }
 
   IUIndex.setIndex(IU_index);
-  var IU_end = glob_data.features[IUIndex.getIndex()].properties.endemicity;
+
   setInputParams({'nMDA':40});
   var scenLabel = $('#inputScenarioLabel').val();
    //max number of mda rounds even if doing it six monthly.
@@ -653,6 +657,7 @@ function runMapSimulation(){
 
     $('#map-progress-bar').css('width',Number(progression*100/maxN)+'%');
     if (IU_index){
+      var IU_end = glob_data.features[IUIndex.getIndex()].properties.endemicity;
       if (IU_end=='low'){
         prev = 5.0;
       } else if (IU_end=='medium'){
