@@ -268,13 +268,14 @@ function createScenarioBoxes(){
       }
     });
     $('#show-settings').tooltip();
+    /*
     d3.select('#scenario-button-group').append('a').attr('class','btn btn-primary')
     .attr('data-toggle',"tooltip").attr('data-placement',"top").attr('title',"Download")
     .html('<span class="glyphicon glyphicon-download-alt gylphicon-white"></i>')
     .attr('id','download')
     .on('click',download);
     $('#download').tooltip();
-
+    */
     d3.select('#scenario-button-group').append('a').attr('class','btn btn-danger')
     .html('<span class="glyphicon glyphicon-remove-circle gylphicon-white"></i>')
     .attr('data-toggle',"tooltip").attr('data-placement',"top").attr('title',"Delete")
