@@ -161,9 +161,14 @@ ScenarioIndex.setIndex = function(ind){
   try{
     var ses = SessionData.retrieveSession();
     var scen = ses.scenarios[ind];
+    var IU_name = undefined;
     params = scen.params;
     IUIndex.setIndex(scen.IU);
-    $('#scenario-title').html(ses.scenarios[ind].label + ' Overview');
+    if (scen.IU){
+      IU_name = glob_data.features[scen.IU].properties.ADMIN3;
+    }
+    $('#scenario-title').html(ses.scenarios[ind].label + ' Overview'+
+      ((IU_name)? ': '+IU_name : ''));
   }catch(err){console.log(err);}
 
   return localStorage.setItem('scenarioIndex',ind);
@@ -415,7 +420,7 @@ function createScenarioBoxesOld(){
           bootbox.confirm("Are you sure you want to delete this scenario?", function(result) {
             if(result){
               var n = SessionData.retrieveSession().scenarios.length
-              
+
               SessionData.deleteScenario();
               createScenarioBoxes();
               scenarioComparisonSelectVisibility();
@@ -854,7 +859,7 @@ function runSimClick(){
 
 function drawMap(select_IU) {
   if (select_IU === undefined) {
-    fruit = false;
+    select_IU = false;
   }
   queue().defer(function(){
                             d3.json('./assets/EthiopiaSimplify.json',function(err,data){
@@ -883,6 +888,7 @@ function drawMap(select_IU) {
                               });
                             })
                             .defer(function(){
+
                               IU = IUIndex.getIndex();
                               d = glob_data.features[IU];
                               clickedIU(d,IU,true);
@@ -1013,6 +1019,7 @@ $(document).ready(function(){
   if (SessionData.ran(0)){
     resetSlider();
   }
+
   createScenarioBoxes();
   scenarioComparisonSelectVisibility();
   drawComparisonPlot();
@@ -1038,72 +1045,84 @@ $(document).ready(function(){
 
 
   function ready(error, data) {
-            d3.select('#map').select('img').remove();
-            glob_data = data; //debug this.
-            console.log(data.features.length);
-            //var prevs = new Array(data.geometries.length); //data.geometries.length
-            //for (i=0; i< prevs.length; i++){
-            //  console.log(i);
-            //  prevs[i] = glob_prevs[i].meanpMF;
-            //}
-            console.log(glob_data);
-            var group = canvas.selectAll("g")
-                .data(data.features) //data.geometries
-                .enter()
-                .append("g");
-            //var projection = d3.geo.albers()
-            //                    .center([0, 9.1])
-            //                    .rotate([40.4, 0])
-            //                    .parallels([0, 20])
-            //                    .scale(1200 * 5)
-            //                    .translate([width / 2, height / 2]);
+            queue().defer(function(){
+              d3.select('#map').select('img').remove();
+              glob_data = data; //debug this.
+              var ind = ScenarioIndex.getIndex();
+              var ses = SessionData.retrieveSession();
+              var scen = ses.scenarios[ind];
+              var IU_name = glob_data.features[scen.IU].properties.ADMIN3;
+              $('#scenario-title').html(ses.scenarios[ind].label + ' Overview'+
+                ((IU_name)? ': '+IU_name : ''));
+              console.log(data.features.length);
+              //var prevs = new Array(data.geometries.length); //data.geometries.length
+              //for (i=0; i< prevs.length; i++){
+              //  console.log(i);
+              //  prevs[i] = glob_prevs[i].meanpMF;
+              //}
+              console.log(glob_data);
+              var group = canvas.selectAll("g")
+                  .data(data.features) //data.geometries
+                  .enter()
+                  .append("g");
+              //var projection = d3.geo.albers()
+              //                    .center([0, 9.1])
+              //                    .rotate([40.4, 0])
+              //                    .parallels([0, 20])
+              //                    .scale(1200 * 5)
+              //                    .translate([width / 2, height / 2]);
 
-            //var path = d3.geo.path()
-            //    .projection(projection);
+              //var path = d3.geo.path()
+              //    .projection(projection);
 
 
 
 
 
-            var projection = d3.geo.equirectangular()
-                              .center([40.4,8.0]) //40.4,4.0
-                              .scale(1500)
-                              .translate([width / 2, height / 2])
-                              .precision(.1);
-            var path = d3.geo.path().projection(projection);
-            var areas = group.append("path")
-                .attr("d", path)
-                .attr("id",function(d,i){return i})
-                .attr("class", function(d,i) {
+              var projection = d3.geo.equirectangular()
+                                .center([40.4,8.0]) //40.4,4.0
+                                .scale(1500)
+                                .translate([width / 2, height / 2])
+                                .precision(.1);
+              var path = d3.geo.path().projection(projection);
+              var areas = group.append("path")
+                  .attr("d", path)
+                  .attr("id",function(d,i){return i})
+                  .attr("class", function(d,i) {
 
-                  return colorIU(data.features[i].properties.endemicity,
-                                 data.features[i].properties.prev,
-                                 data.features[i].properties.pop,1.0,1.0,1.0);
-                })
-                .attr("data-prev",function(d,i){
-                  if(i<data.features.length){
-                    return data.features[i].properties.prev;
-                  }else{
-                    return Math.random();
-                  }
-                })
-                .on('mousemove', function(d,i) {
-                    tooltip.style("visibility", "visible").html("<h5 class='text-center'> "
-                    + data.features[i].properties.ADMIN1 + ", " + data.features[i].properties.ADMIN2 + ", "
-                    + data.features[i].properties.ADMIN3 + ", "
-                    + "prevalence : " + Math.round(100*data.features[i].properties.prev) + "%. "
-                    + "Population size : " + numberWithCommas(Math.round(data.features[i].properties.pop))
-                    + " </h5>");
-                })
-                .on('click',function(d,i){
+                    return colorIU(data.features[i].properties.endemicity,
+                                   data.features[i].properties.prev,
+                                   data.features[i].properties.pop,1.0,1.0,1.0);
+                  })
+                  .attr("data-prev",function(d,i){
+                    if(i<data.features.length){
+                      return data.features[i].properties.prev;
+                    }else{
+                      return Math.random();
+                    }
+                  })
+                  .on('mousemove', function(d,i) {
+                      tooltip.style("visibility", "visible").html("<h5 class='text-center'> "
+                      + data.features[i].properties.ADMIN1 + ", " + data.features[i].properties.ADMIN2 + ", "
+                      + data.features[i].properties.ADMIN3 + ", "
+                      + "prevalence : " + Math.round(100*data.features[i].properties.prev) + "%. "
+                      + "Population size : " + numberWithCommas(Math.round(data.features[i].properties.pop))
+                      + " </h5>");
+                  })
+                  .on('click',function(d,i){
 
-                  console.log(d);
-                  clickedIU(d,i);
-                })
-                .on('mouseout', function() {
-                    tooltip.style("visibility", "hidden");
+                    console.log(d);
+                    clickedIU(d,i);
+                  })
+                  .on('mouseout', function() {
+                      tooltip.style("visibility", "hidden");
+                  });
+                }).defer(function(){
+                  IU = IUIndex.getIndex();
+                  d = glob_data.features[IU];
+                  clickedIU(d,IU,true);
                 });
-        }
+          }
 
 
 
